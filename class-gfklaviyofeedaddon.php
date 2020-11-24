@@ -79,7 +79,7 @@ class GFKlaviyoAPI extends GFFeedAddOn {
 					'$email' => $merge_vars['email'], 
 					// '$first_name' => $merge_vars['first_name'], 
 					// '$last_name' => $merge_vars['last_name'], 
-					'$country' => $merge_vars['country']
+					'$country' => $merge_vars['country'] // country field
 				)
             // array('Item SKU' => 'ABC123', 'Payment Method' => 'Credit Card'),
             // 1354913220
@@ -88,18 +88,41 @@ class GFKlaviyoAPI extends GFFeedAddOn {
 
         if ($this->get_plugin_setting('private_api_key')) {
 			$url = 'https://a.klaviyo.com/api/v2/list/' .$list_id. '/members';
+
+			$formatted_date_of_birth = "";
+			if(!empty($merge_vars['date_of_birth'])) {
+				$formatted_date_of_birth = date("m/d/Y", strtotime($merge_vars['date_of_birth']));
+			}
+
+			$post_body = json_encode(
+				[
+					'api_key' => $this->get_plugin_setting('private_api_key'),
+					'profiles' => array(
+						[
+							'email' => $merge_vars['email'],
+							'$first_name' => $merge_vars['first_name'],
+							'$last_name' => $merge_vars['last_name'],
+							'$country' => $merge_vars['country'],
+							'interests' => $merge_vars['interests'],
+							'date_of_birth' => $formatted_date_of_birth,
+							'gender' => $merge_vars['gender']
+						]
+					)
+				]
+			, JSON_PRETTY_PRINT);
+
+			error_log("KLAVIYO POST PAYLOAD");
+			error_log($post_body);
 			
-        	wp_remote_post($url,array(
-        		'body' => json_encode(array(
-        			'api_key' => $this->get_plugin_setting('private_api_key'),
-        			'profiles' => array(
-						'email' => $merge_vars['email'],
-        				// '$first_name' => $merge_vars['first_name'],
-        				// '$last_name' => $merge_vars['last_name'],
-        				'$country' => $merge_vars['country']
-        			)
-        		)
-        	));
+        	$result = wp_remote_post($url,array(
+				'headers' => [
+					'Content-Type' => 'application/json',
+				], 
+        		'body' => $post_body
+			));
+
+			error_log("KLAVIYO RESULT");
+			error_log($result['body']);
         }
 	}
 
@@ -191,21 +214,36 @@ class GFKlaviyoAPI extends GFFeedAddOn {
 								'required'   => true,
 								'field_type' => array( 'email', 'hidden' ),
 							),
-							// array(
-                            //     'name'     => 'first_name',
-                            //     'label'    => esc_html__( 'First Name', 'klaviyoaddon' ),
-                            //     'required' => true
-                            // ),
-                            // array(
-                            //     'name'     => 'last_name',
-                            //     'label'    => esc_html__( 'Last Name', 'klaviyoaddon' ),
-                            //     'required' => true
-							// ),
+							array(
+                                'name'     => 'first_name',
+                                'label'    => esc_html__( 'First Name', 'klaviyoaddon' ),
+                                'required' => false
+                            ),
+                            array(
+                                'name'     => 'last_name',
+                                'label'    => esc_html__( 'Last Name', 'klaviyoaddon' ),
+                                'required' => false
+							),
+                            array(
+                                'name'     => 'date_of_birth',
+                                'label'    => esc_html__( 'Date of Birth', 'klaviyoaddon' ),
+								'required' => false
+							),
+                            array(
+                                'name'     => 'gender',
+                                'label'    => esc_html__( 'Gender', 'klaviyoaddon' ),
+                                'required' => false
+							),
+                            array(
+                                'name'     => 'interests',
+                                'label'    => esc_html__( 'Interests', 'klaviyoaddon' ),
+                                'required' => false
+							),
 							array(
                                 'name'     => 'country',
                                 'label'    => esc_html__( 'Country', 'klaviyoaddon' ),
                                 'required' => true
-                            ),
+                            )
 						),
 					),
 					array(

@@ -1,11 +1,11 @@
 <?php
 /*
-Plugin Name: Gravity Forms Klaviyo Add-On
+Plugin Name: Gravity Forms Klaviyo Add-On: STS edition
 Plugin URI: http://www.gravityforms.com
-Description: Integrates Gravity Forms with Klaviyo allowing form submissions to be automatically sent to your Klaviyo account.
-Version: 1.0
-Author: EFE Technology
-Author URI: http://efe.com.vn/
+Description: Integrates Gravity Forms with Klaviyo allowing form submissions to be automatically sent to your Klaviyo account. This plugin has been updated to use Klaviyo API v2.
+Version: 2.0
+Author: Sea To Summit, Lauri Jalonen
+Author URI: https://seatosummit.com/
 */
 
 require_once('includes/Klaviyo.php');
